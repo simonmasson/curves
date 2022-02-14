@@ -11,7 +11,7 @@ use ark_ec::{
     },
     short_weierstrass_jacobian::{GroupAffine, GroupProjective},
 };
-use ark_ff::{field_new, Zero};
+use ark_ff::{field_new, Zero, BigInteger256};
 
 #[cfg(test)]
 mod tests;
@@ -64,12 +64,13 @@ impl TEModelParameters for VestaParameters {
 
     type MontgomeryModelParameters = VestaParameters;
 
-    /// Multiplication by `a` is just negation.
-    /// Is `a` 1 or -1?
     #[inline(always)]
     fn mul_by_a(elem: &Self::BaseField) -> Self::BaseField {
-        -*elem
+        Self::BaseField::from(BigInteger256([
+            263294614177016283, 14751359859395633415, 845045001895911217, 3008163260104276743
+        ])) * elem
     }
+
 }
 
 impl MontgomeryModelParameters for VestaParameters {
