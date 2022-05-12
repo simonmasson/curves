@@ -1,16 +1,19 @@
-use ark_ec::models::{
+use ark_ec::{models::{
     twisted_edwards_extended::{
         GroupAffine as TEGroupAffine, GroupProjective as TEGroupProjective,
     },
     ModelParameters, MontgomeryModelParameters, SWModelParameters, TEModelParameters,
-};
-use ark_ff::{MontFp, Zero};
+}, bls12::{self, Bls12Parameters}, AffineCurve, glv::GLVParameters, ProjectiveCurve};
+use ark_ff::{MontFp, Zero, BigInteger256};
 use core::ops::Neg;
 
 use crate::{
     fields::{FQ_ONE, FQ_ZERO},
     Fq, Fr,
 };
+
+pub type G1Affine = bls12::G1Affine<crate::Parameters>;
+pub type G1Projective = bls12::G1Projective<crate::Parameters>;
 
 #[derive(Clone, Default, PartialEq, Eq)]
 pub struct Parameters;
@@ -45,6 +48,28 @@ impl SWModelParameters for Parameters {
     fn mul_by_a(_: &Self::BaseField) -> Self::BaseField {
         Self::BaseField::zero()
     }
+
+    #[inline]
+    fn is_in_correct_subgroup_assuming_on_curve(p: &G1Affine) -> bool {
+        // Algorithm from Section 6 of https://eprint.iacr.org/2021/1130.
+        //
+        // Check that endomorphism_p(P) == -[X^2]P
+
+        let x = BigInteger256::new([crate::Parameters::X[0], 0, 0, 0]);
+
+        // An early-out optimization described in Section 6.
+        // If uP == P but P != point of infinity, then the point is not in the right
+        // subgroup.
+        let x_times_p = p.mul(x);
+        if x_times_p.eq(p) && !p.infinity {
+            return false;
+        }
+
+        let minus_x_squared_times_p = x_times_p.mul(x).neg();
+        let endomorphism_p = <Parameters as GLVParameters>::endomorphism(p);
+        minus_x_squared_times_p.eq(&endomorphism_p)
+    }
+    
 }
 
 pub type G1TEAffine = TEGroupAffine<Parameters>;

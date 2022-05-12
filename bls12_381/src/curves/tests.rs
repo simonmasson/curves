@@ -22,11 +22,6 @@ generate_g1_generator_raw_test!(bls12_381, 4);
 generate_glv_test!(G1Parameters, G2Parameters);
 
 #[test]
-fn test_g1_endomorphism_beta() {
-    assert!(g1::BETA.pow(&[3u64]).is_one());
-}
-
-#[test]
 fn test_g1_subgroup_membership_via_endomorphism() {
     let mut rng = test_rng();
     let generator = G1Projective::rand(&mut rng).into_affine();
