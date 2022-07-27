@@ -25,7 +25,6 @@ use ark_ec::short_weierstrass_jacobian::GroupAffine;
 #[test]
 fn test_g1_projective_curve() {
     curve_tests::<G1Projective>();
-
     sw_tests::<g1::Parameters>();
     edwards_tests::<g1::Parameters>();
 }
@@ -43,6 +42,9 @@ fn test_g1_generator() {
     let generator = G1Affine::prime_subgroup_generator();
     assert!(generator.is_on_curve());
     assert!(generator.is_in_correct_subgroup_assuming_on_curve());
+    let generator_te = g1::G1TEAffine::prime_subgroup_generator();
+    assert!(generator_te.is_on_curve());
+    assert!(generator_te.is_in_correct_subgroup_assuming_on_curve());
 }
 
 #[test]
@@ -55,8 +57,6 @@ fn test_g2_projective_curve() {
 #[test]
 fn test_g2_projective_group() {
     let mut rng = test_rng();
-    // let a = G2Projective::prime_subgroup_generator(); works but rng.gen()
-    // produces a point of order != r...
     let a: G2Projective = rng.gen();
     let b: G2Projective = rng.gen();
     group_test(a, b);
