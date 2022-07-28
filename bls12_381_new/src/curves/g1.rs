@@ -9,9 +9,6 @@ use ark_ff::{field_new, Zero};
 pub type G1Affine = bls12::G1Affine<crate::Parameters>;
 pub type G1Projective = bls12::G1Projective<crate::Parameters>;
 
-pub type G1TEAffine = bls12::G1TEAffine<crate::Parameters>;
-pub type G1PTErojective = bls12::G1TEProjective<crate::Parameters>;
-
 #[derive(Clone, Default, PartialEq, Eq)]
 pub struct Parameters;
 
